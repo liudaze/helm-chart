@@ -200,3 +200,7 @@ An example of the necessary `PersistentVolume`:
 > **Warning**: `hostPath` volumes cannot be migrated between machines by Kubernetes, as such,
 in this example, we have restricted the `nfs-server-provisioner` pod to run on a single node. This
 is unsuitable for production deployments.
+
+**Warning** if wrong happend, you should install `nfs-utils`
+
+    yum intall nfs-utils
