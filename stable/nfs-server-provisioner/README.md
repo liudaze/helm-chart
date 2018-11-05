@@ -201,6 +201,6 @@ An example of the necessary `PersistentVolume`:
 in this example, we have restricted the `nfs-server-provisioner` pod to run on a single node. This
 is unsuitable for production deployments.
 
-**Warning** if wrong happend, you should install `nfs-utils` in the host server:
+**Warning** you should install `nfs-utils` in all the k8s cluster node server:
 
     yum install nfs-utils -y
