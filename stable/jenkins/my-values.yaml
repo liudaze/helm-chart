@@ -18,7 +18,7 @@ Master:
   UseSecurity: true
   HostNetworking: false
   AdminUser: admin
-  # AdminPassword: <defaults to random>
+  AdminPassword: 123qwe!@#
   resources:
     requests:
       cpu: "50m"
@@ -36,6 +36,7 @@ Master:
   # Set min/max heap here if needed with:
   # JavaOpts: "-Xms512m -Xmx512m"
   # JenkinsOpts: ""
+  # If you set this prefix and use ingress controller then you might want to set the ingress path below
   # JenkinsUriPrefix: "/jenkins"
   # Enable pod security context (must be `true` if RunAsUser or FsGroup are set)
   UsePodSecurityContext: true
@@ -46,7 +47,8 @@ Master:
   ServicePort: 8080
   # For minikube, set this to NodePort, elsewhere use LoadBalancer
   # Use ClusterIP if your setup includes ingress controller
-  ServiceType: LoadBalancer
+  #ServiceType: LoadBalancer
+  ServiceType: ClusterIP
   # Master Service annotations
   ServiceAnnotations: {}
   #   service.beta.kubernetes.io/aws-load-balancer-backend-protocol: https
@@ -120,7 +122,7 @@ Master:
   # Node labels and tolerations for pod assignment
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#taints-and-tolerations-beta-feature
-  NodeSelector: {}
+  NodeSelector: { jenkins: enabled }
   Tolerations: {}
   PodAnnotations: {}
 
@@ -129,6 +131,9 @@ Master:
     Annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
+
+    # Set this path to JenkinsUriPrefix above or use annotations to rewrite path
+    # Path: "/jenkins"
 
     TLS:
     # - secretName: jenkins.cluster.local
@@ -163,7 +168,7 @@ Agent:
   # - type: Secret
   #   secretName: mysecret
   #   mountPath: /var/myapp/mysecret
-  NodeSelector: {}
+  NodeSelector: { jenkins: enabled }
   # Key Value selectors. Ex:
   # jenkins-agent: v1
 
@@ -173,6 +178,7 @@ Persistence:
   ## Requires Persistence.Enabled: true
   ## If defined, PVC must be created manually before volume will be bound
   # ExistingClaim:
+  ExistingClaim: nfs-jenkins-pvc
 
   ## jenkins data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
@@ -184,8 +190,8 @@ Persistence:
   # StorageClass: "-"
 
   Annotations: {}
-  AccessMode: ReadWriteOnce
-  Size: 8Gi
+  AccessMode: ReadWriteMany
+  Size: 5Gi
   volumes:
   #  - name: nothing
   #    emptyDir: {}
@@ -203,7 +209,7 @@ NetworkPolicy:
 
 ## Install Default RBAC roles and bindings
 rbac:
-  install: false
+  install: true
   serviceAccountName: default
   # Role reference
   roleRef: cluster-admin
